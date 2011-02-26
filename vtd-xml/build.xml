@@ -1,0 +1,57 @@
+<project name="VTD-XML Test" default="compile" basedir=".">
+	<description>
+        VTD-XML Test
+    </description>
+	<!-- set global properties for this build -->
+	<property name="src" location="src/main/java" />
+    <property name="src.tests" location="src/main/java/tests" />
+    <property name="libs" location="src/main/resources" />
+	<property name="build" location="build" />
+	<property name="version" value="1.0" />
+    <property name="enableJavacDebug" value="true" />
+
+	<!-- the classpath to be used in the project -->
+	<path id="project.classpath">
+		<pathelement location="${build}" />
+		<dirset dir="${build}/tests">
+			<include name="**/*.class"/>
+		</dirset>
+		<pathelement path="src/main/resources" />
+		<fileset dir="${libs}">
+			<include name="**/*.jar" />
+		</fileset>
+	</path>
+
+	<target name="compile">
+        <mkdir dir="${build}" />
+		<javac srcdir="${src}" destdir="${build}" debug="${enableJavacDebug}">
+			<classpath refid="project.classpath" />
+		</javac>
+	</target>
+
+	<target name="clean" description="clean up">
+		<delete dir="${build}" />
+	</target>
+
+	<!-- target for running the JUnit tests -->
+	<target name="test" depends="compile">
+		<junit fork="no" haltonfailure="yes">
+            <classpath refid="project.classpath" />
+			<formatter type="plain" usefile="false" />
+            <batchtest>
+                <fileset dir="${src.tests}">
+                    <include name="**/*Test*.java"/>
+                </fileset>
+            </batchtest>
+		</junit>
+	</target>
+
+    <!-- runs a specific unit test class -->
+    <target name="test-class" depends="compile">
+        <junit fork="no" haltonfailure="yes" showoutput="yes">
+            <test name="${class}" />
+            <formatter type="plain" usefile="false" />
+            <classpath refid="project.classpath" />
+        </junit>
+    </target>
+</project>
