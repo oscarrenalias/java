@@ -6,10 +6,6 @@ import com.ximpleware.VTDNav;
 
 public class VtdXmlBenchmark {
 
-	public void testXml() {
-		System.out.println("Hello, world");
-	}
-
 	public void run(String sourceFile) throws NavException {
 		VTDGen vg = new VTDGen();
 		if (vg.parseFile(sourceFile, true)) {
