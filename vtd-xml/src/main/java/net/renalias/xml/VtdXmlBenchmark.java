@@ -1,24 +1,53 @@
 package net.renalias.xml;
 
+import com.ximpleware.AutoPilot;
 import com.ximpleware.NavException;
 import com.ximpleware.VTDGen;
 import com.ximpleware.VTDNav;
+import com.ximpleware.extended.PilotException;
+
+import java.awt.dnd.Autoscroll;
+import java.util.LinkedList;
+import java.util.List;
 
 public class VtdXmlBenchmark {
 
-	public void run(String sourceFile) throws NavException {
+	List<AddressCodeLine> lines;
+
+	public void run(String sourceFile) throws NavException, PilotException {
+
+		lines = new LinkedList<AddressCodeLine>();
+
 		VTDGen vg = new VTDGen();
 		if (vg.parseFile(sourceFile, true)) {
 			VTDNav vn = vg.getNav();
-			//toElementNS is the namespace aware version of toElement which navigates the cursor
-			if (vn.toElementNS(VTDNav.FIRST_CHILD, "someURL", "b")) {
-				int i = vn.getText(); // get the VTD record index
-				if (i != -1) {
-					// convert i into string before printing,
-					// toNormalizedString(i) and toRawString(i) are two other options
-					System.out.println("the text node value at " + i + " ==> " + vn.toString(i));
+
+			AutoPilot ap = new AutoPilot(vn);
+			ap.selectElement("*");
+			int total=0;
+			while (ap.iterate()) {
+				String elementName = vn.toString(vn.getCurrentIndex());
+
+				if(elementName.equals("ns2:AddressCodeLine")) {
+					int codeInt = vn.getAttrVal("code");
+					String code = "";
+					if (codeInt != -1) {
+						code = vn.toNormalizedString(codeInt);
+					}
+					int idInt = vn.getAttrVal("id");
+					String id = "";
+					if (idInt != -1)
+						id = vn.toNormalizedString(idInt);
+
+					lines.add(new AddressCodeLine(id, code));
+
+					total++;
 				}
+
+				//System.out.println("Id:" + id + " - Code: " + code);
 			}
+
+			System.out.println("Total nodes processed:" + total);
 		}
 	}
 }
